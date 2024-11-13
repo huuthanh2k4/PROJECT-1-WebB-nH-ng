@@ -3,12 +3,14 @@ package Porject.DieuKhien;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller; 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import Porject.GoiHamChucNang.GoiHam;
@@ -31,6 +33,8 @@ public class TrangNguoiDung {
 	
 	@Autowired 
 	private GoiHamThongTinSP goiHamThongTinSP;
+
+	private Object imgSP;
 	
 	@RequestMapping("/usera")
 	public String TrangUser (Model model) {	
@@ -75,34 +79,49 @@ public class TrangNguoiDung {
 	}
 	
 
+	@RequestMapping(value = "/chitiet", method = {RequestMethod.GET, RequestMethod.POST})
+	public String ChiTietSP(
+	        @RequestParam(value = "idSP", required = false) String idSP,
+	        @RequestParam(value = "ten", required = false) String ten,
+	        Model model, HttpSession session) {
+
+	    List<CauHinhSP> cauHinhSPs = null;
+	    DanhSachSP danhSachSP = null; 
+	    ImgSP imgSP =null;
+
+	    if (idSP != null) {
+	        // Xử lý khi người dùng truy cập lần đầu với idSP
+	        imgSP = goiHamThongTinSP.ChiTiet(idSP);
+
+	        cauHinhSPs = goiHamThongTinSP.layCauHinhSPTheoIdSP(idSP);
+
+	        danhSachSP = goiHamDanhSachSP.LayIdDS(idSP);
+
+	        session.setAttribute("cauHinhSPs", cauHinhSPs); // Lưu vào session
+	        session.setAttribute("danhSachSP", danhSachSP); // Lưu vào session
+	        session.setAttribute("imgSP", imgSP); // Lưu thông tin sản phẩm ban đầu
+
+	    } 
+
+	    if (ten != null) {
+	        // Xử lý khi người dùng tìm kiếm sản phẩm thứ hai với ten
+	        List<CauHinhSP> ten1 = goiHamThongTinSP.TimKiemSP(ten);
+	        model.addAttribute("CH1", ten1);
+
+	        cauHinhSPs = (List<CauHinhSP>) session.getAttribute("cauHinhSPs");
+	        danhSachSP = (DanhSachSP) session.getAttribute("danhSachSP");
+	         imgSP = (ImgSP) session.getAttribute("imgSP");
+	    }
+	    model.addAttribute("SP", imgSP);
+	    model.addAttribute("CH", cauHinhSPs);
+	    model.addAttribute("DS", danhSachSP);
+
+	    List<DanhSachSP> sachSPs = goiHamDanhSachSP.layThongTinSP();
+	    model.addAttribute("DSSP", sachSPs);
+
+	    return "ChiTietSP";
 	
-	@RequestMapping("/chitiet")
-    public String ChiTietSP(@RequestParam("idSP")String idSP,
-    						Model model) {
-        ImgSP imgSP = goiHamThongTinSP.ChiTiet(idSP);
-        model.addAttribute("SP", imgSP);
-        
-        List<CauHinhSP> cauHinhSPs = goiHamThongTinSP.layCauHinhSPTheoIdSP(idSP);
-        model.addAttribute("CH", cauHinhSPs);
-        
-        DanhSachSP danhSachSP = goiHamDanhSachSP.LayIdDS(idSP);
-        model.addAttribute("DS", danhSachSP);
-        
-        List<DanhSachSP> sachSPs = goiHamDanhSachSP.layThongTinSP();
-        model.addAttribute("DSSP", sachSPs);
-        
-        
-        return "ChiTietSP"; 
-    }
-	
-	@RequestMapping("/chitiet1")
-    public String ChiTietSP1(@RequestParam("ten")String ten,Model model) {
-       
-        List<CauHinhSP> ten1 = goiHamThongTinSP.TimKiemSP(ten);
-        model.addAttribute("CH1", ten1);
-        
-        return "ChiTietSP"; 
-    }
+	}
 	
 	
 }
