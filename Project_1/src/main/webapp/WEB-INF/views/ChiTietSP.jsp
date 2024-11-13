@@ -520,6 +520,7 @@
         <div class="spec-section">
           <button class="spec-button" onclick="toggleSection('spec-details-1')">Cấu hình & Bộ nhớ</button>
           <div id="spec-details-1" class="spec-details" style="display: none;">
+          	<p></p>
           	<p><strong>Tên sản phẩm:</strong>${CHCH.DSSP.tenSP}</p>
             <p><strong>Chip xử lý (CPU):</strong>${CHCH.c.tenChip}</p>
             <p><strong>Độ phân giải:</strong> ${CHCH.DPG.doPhanGiai}</p>
@@ -544,7 +545,7 @@
       <button class="spec-button" onclick="toggleSection('spec-details-2')">So sánh sản phẩm</button>
       <div id="spec-details-2" class="spec-details" style="display: none;">
       <p>
-      	<form action="chitiet1" method="post"">
+      	<form action="chitiet" method="post">
       	<div>
   <label for="brand">Thương hiệu:</label>
   <input type="text" id="brandInput" placeholder="Nhập tên sản phẩm..." oninput="filterBrands()">
